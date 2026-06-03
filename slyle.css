@@ -1,28 +1,423 @@
-/* --- CONFIGURAÇÕES E ESTILO VISUAL PERSONALIZÁVEL --- */
+/* --- CONFIGURAÇÕES E ESTILO VISUAL DA PALETA REVISADA --- */
 :root {
-    /* Paleta de Cores Estrita e de Alto Contraste */
-    --preto-absoluto: #050508;     /* Fundo Geral */
-    --azul-profundo: #0A1128;      /* Fundo de Cards */
-    --azul-metalico: #1C2541;      /* Bordas e Elementos Secundários */
-    --azul-celeste: #0077B6;       /* Botões e Destaques Principais */
-    --azul-cristal: #90E0EF;       /* Textos de Destaque e Links */
-    --roxo-neon: #7209B7;          /* Detalhes Futuristas e Efeito Hover */
-    --prata-tecnico: #E2E8F0;      /* Cor Principal dos Parágrafos (Muito Legível) */
-    --branco-puro: #FFFFFF;        /* Títulos Grandes */
+    /* Cores Rigorosamente Definidas para Legibilidade Absoluta */
+    --preto-absoluto: #030712;     /* Fundo principal da página */
+    --azul-profundo: #0B132B;      /* Fundos dos blocos e containers */
+    --azul-metalico: #1C2541;      /* Fundos de botões e bordas estruturais */
+    --azul-celeste: #0077B6;       /* Elementos primários de destaque e CTAs */
+    --azul-cristal: #00F5D4;       /* Títulos de seções, ícones e sublinhados */
+    --roxo-neon: #7209B7;          /* Efeitos de Hover e interações dinâmicas */
+    --prata-tecnico: #E2E8F0;      /* Cor base de toda a escrita (Contraste Máximo sobre o Preto) */
+    --branco-puro: #FFFFFF;        /* Títulos principais e chamadas do formulário */
     
-    /* Variáveis Globais de Estrutura */
-    --fonte-dinamica: clamp(1rem, 0.95rem + 0.22vw, 1.2rem);
-    --curvatura-componentes: 16px;
-    --sombra-suave: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    /* Configurações Responsivas Fluidas */
+    --fonte-dinamica: clamp(1rem, 0.95rem + 0.22vw, 1.25rem);
+    --curvatura-componentes: 14px;
+    --sombra-suave: 0 10px 40px rgba(0, 0, 0, 0.6);
     --transicao-padrao: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --espacamento-bloco: clamp(1.5rem, 3vw, 3rem);
+    --espacamento-bloco: clamp(1.5rem, 4vw, 3.5rem);
 }
 
-/* Forçando o Reset de Cores de Auto-Contraste no Body */
+/* --- RESET & REGRAS BASE DE EXIBIÇÃO --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: var(--fonte-dinamica);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 body {
-    background-color: var(--preto-absoluto) !important;
-    color: var(--prata-tecnico) !important;
+    background-color: var(--preto-absoluto);
+    color: var(--prata-tecnico);
     line-height: 1.7;
-    transition: var(--transicao-padrao);
     overflow-x: hidden;
+}
+
+/* --- PAINEL DE ACESSIBILIDADE FLUTUANTE (SUPERIOR DIREITO) --- */
+.acessibilidade-flutuante {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--azul-profundo);
+    border: 2px solid var(--azul-celeste);
+    padding: 10px;
+    border-radius: var(--curvatura-componentes);
+    display: flex;
+    gap: 10px;
+    z-index: 9999;
+    box-shadow: var(--sombra-suave);
+}
+
+.acessibilidade-flutuante button {
+    background: var(--azul-metalico);
+    color: var(--branco-puro);
+    border: 1px solid transparent;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: var(--transicao-padrao);
+}
+
+.acessibilidade-flutuante button:hover {
+    background: var(--roxo-neon);
+    color: var(--branco-puro);
+}
+
+.acessibilidade-flutuante button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* --- 1. HERO SECTION --- */
+.hero-section {
+    position: relative;
+    min-height: 70vh;
+    background: linear-gradient(135deg, var(--preto-absoluto) 40%, var(--azul-profundo) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--espacamento-bloco);
+    text-align: center;
+    border-bottom: 3px solid var(--roxo-neon);
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, transparent 30%, var(--preto-absoluto) 90%);
+    pointer-events: none;
+}
+
+.hero-container {
+    position: relative;
+    z-index: 2;
+    max-width: 950px;
+}
+
+.titulo-moderno {
+    font-size: clamp(2.2rem, 5vw, 4.2rem);
+    color: var(--branco-puro);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+}
+
+.subtitulo-moderno {
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: var(--azul-cristal);
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+}
+
+.btn-chamada {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--azul-celeste);
+    color: var(--branco-puro);
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--curvatura-componentes);
+    box-shadow: var(--sombra-suave);
+    transition: var(--transicao-padrao);
+}
+
+.btn-chamada:hover {
+    background: var(--roxo-neon);
+    transform: translateY(-3px);
+}
+
+/* --- LAYOUT GRID RESPONSIVO --- */
+.layout-grid {
+    max-width: 1500px;
+    margin: 4rem auto;
+    padding: 0 var(--espacamento-bloco);
+    display: grid;
+    grid-template-columns: minmax(320px, 2fr) minmax(300px, 1fr);
+    gap: 4rem;
+}
+
+/* --- BLOCOS DE CONTEÚDO TEXTUAL --- */
+.bloco-texto {
+    margin-bottom: 3.5rem;
+}
+
+.bloco-texto h2 {
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    color: var(--branco-puro);
+    margin-bottom: 1.5rem;
+    border-left: 5px solid var(--azul-celeste);
+    padding-left: 15px;
+}
+
+.bloco-texto p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+    color: var(--prata-tecnico);
+}
+
+.bloco-texto strong {
+    color: var(--azul-cristal);
+}
+
+.citacao-futurista {
+    background: var(--azul-profundo);
+    border-left: 4px solid var(--roxo-neon);
+    padding: 2rem;
+    margin: 2.5rem 0;
+    font-style: italic;
+    color: var(--branco-puro);
+    border-radius: var(--curvatura-componentes);
+    box-shadow: var(--sombra-suave);
+}
+
+/* --- COMPONENTE DE IMAGENS --- */
+.imagem {
+    margin: 2.5rem 0;
+    border-radius: var(--curvatura-componentes);
+    overflow: hidden;
+    box-shadow: var(--sombra-suave);
+    border: 1px solid var(--azul-metalico);
+}
+
+.imagem img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: var(--transicao-padrao);
+}
+
+.imagem img:hover {
+    transform: scale(1.03);
+}
+
+/* --- ACCORDION DE BENEFÍCIOS --- */
+.secao-beneficios {
+    margin: 4rem 0;
+}
+
+.descricao-intro {
+    margin-bottom: 1.5rem;
+}
+
+.subtitulo-cards {
+    color: var(--branco-puro);
+    margin: 2.5rem 0 1.5rem 0;
+    font-size: 1.4rem;
+}
+
+.accordion-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.card-item {
+    background: var(--azul-profundo);
+    border-radius: var(--curvatura-componentes);
+    border: 1px solid var(--azul-metalico);
+    overflow: hidden;
+    transition: var(--transicao-padrao);
+}
+
+.accordion-disparador {
+    width: 100%;
+    padding: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--branco-puro);
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.icone-status {
+    font-size: 1.5rem;
+    color: var(--azul-cristal);
+    transition: var(--transicao-padrao);
+}
+
+.accordion-painel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.accordion-painel p {
+    padding: 1.5rem;
+    color: var(--prata-tecnico);
+    text-align: justify;
+}
+
+/* Estado ativo injetado via JS */
+.card-item.ativo {
+    border-color: var(--azul-celeste);
+}
+
+.card-item.ativo .icone-status {
+    transform: rotate(45deg);
+    color: var(--roxo-neon);
+}
+
+/* --- FORMULÁRIO LATERAL DIREITO --- */
+.coluna-lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.caixa-formulario-destacada {
+    background: var(--azul-profundo);
+    padding: 2.5rem;
+    border-radius: var(--curvatura-componentes);
+    border: 2px solid var(--azul-metalico);
+    box-shadow: var(--sombra-suave);
+    position: sticky;
+    top: 120px;
+}
+
+.caixa-formulario-destacada h3 {
+    color: var(--branco-puro);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.caixa-formulario-destacada p {
+    color: var(--azul-cristal);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+.campo-grupo {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.campo-grupo label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--prata-tecnico);
+}
+
+.campo-grupo input, .campo-grupo textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: var(--preto-absoluto);
+    border: 1px solid var(--azul-metalico);
+    border-radius: 8px;
+    color: var(--branco-puro);
+    font-family: inherit;
+    transition: var(--transicao-padrao);
+}
+
+.campo-grupo input:focus, .campo-grupo textarea:focus {
+    outline: none;
+    border-color: var(--azul-celeste);
+}
+
+.btn-inscricao, .btn-enviar-comentario {
+    width: 100%;
+    padding: 1rem;
+    background: var(--azul-celeste);
+    color: var(--branco-puro);
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transicao-padrao);
+}
+
+.btn-inscricao:hover, .btn-enviar-comentario:hover {
+    background: var(--roxo-neon);
+}
+
+/* --- SEÇÃO DE COMENTÁRIOS --- */
+.container-comentarios {
+    background: var(--azul-profundo);
+    padding: 2.5rem;
+    border-radius: var(--curvatura-componentes);
+    border: 1px solid var(--azul-metalico);
+    margin-top: 4rem;
+}
+
+.container-comentarios h3 {
+    color: var(--branco-puro);
+    margin-bottom: 1.5rem;
+}
+
+.feed-comentarios {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.comentario-item {
+    background: var(--preto-absoluto);
+    padding: 1.2rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--azul-celeste);
+}
+
+/* --- RODAPÉ --- */
+.rodape-futurista {
+    background: var(--preto-absoluto);
+    border-top: 2px solid var(--azul-metalico);
+    padding: 3rem var(--espacamento-bloco);
+    text-align: center;
+    margin-top: 6rem;
+}
+
+.frase-rodape {
+    color: var(--branco-puro);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.referencias-conteudo {
+    font-size: 0.9rem;
+}
+
+.referencias-conteudo a {
+    color: var(--azul-cristal);
+    text-decoration: none;
+    margin-left: 12px;
+}
+
+/* --- RESPONSIVIDADE EM MEDIA QUERIES --- */
+@media (max-width: 1024px) {
+    .layout-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    .caixa-formulario-destacada {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .acessibilidade-flutuante {
+        position: static;
+        width: 100%;
+        justify-content: center;
+        border-radius: 0;
+        border-width: 0 0 2px 0;
+    }
 }

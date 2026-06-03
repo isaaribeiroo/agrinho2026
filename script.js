@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // --- 1. MECÂNICA DE SEÇÕES EXPANSÍVEIS (ACCORDION) ---
+    // --- 1. ACCORDION (CAIXAS EXPANSÍVEIS) ---
     const disparadores = document.querySelectorAll(".accordion-disparador");
 
     disparadores.forEach(botao => {
@@ -9,14 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const painel = this.nextElementSibling;
             const estaAtivo = cardItem.classList.contains("ativo");
 
-            // Fecha todos os painéis abertos de forma limpa (Garantindo comportamento consistente)
+            // Fecha painéis abertos para manter consistência operacional
             document.querySelectorAll(".card-item").forEach(item => {
                 item.classList.remove("ativo");
                 item.querySelector(".accordion-painel").style.maxHeight = null;
                 item.querySelector(".accordion-disparador").setAttribute("aria-expanded", "false");
             });
 
-            // Se o item clicado não estava ativo, abre ele
+            // Ativa o item clicado se ele não estava aberto
             if (!estaAtivo) {
                 cardItem.classList.add("ativo");
                 this.setAttribute("aria-expanded", "true");
@@ -26,13 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // --- 2. PAINEL DE ACESSIBILIDADE DE FONTES E TEMA CLARO/ESCURO ---
-    let escalaFonteAtual = 100; // Percentual base
+    // --- 2. CONTROLE DE ACESSIBILIDADE DE FONTES ---
+    let escalaFonteAtual = 100;
     const htmlElemento = document.documentElement;
     
     const btnAumentar = document.getElementById("btn-fonte-aumentar");
     const btnDiminuir = document.getElementById("btn-fonte-diminuir");
-    const btnAlternarTema = document.getElementById("btn-alternar-tema");
 
     btnAumentar.addEventListener("click", () => {
         if (escalaFonteAtual < 140) {
@@ -48,31 +47,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    btnAlternarTema.addEventListener("click", () => {
-        document.body.classList.toggle("modo-claro");
-    });
 
-
-    // --- 3. SPEECH SYNTHESIS API (SISTEMA DE LEITURA POR VOZ) ---
+    // --- 3. SPEECH SYNTHESIS API (LEITURA POR VOZ ACESSÍVEL) ---
     const btnFalar = document.getElementById("btn-voz-falar");
     const btnParar = document.getElementById("btn-voz-parar");
     const sinteseDeVoz = window.speechSynthesis;
     let instanciaUtterance = null;
 
     btnFalar.addEventListener("click", () => {
-        // REQUISITO: Isolamento semântico. Lê apenas o miolo informativo contido em <main>
         const alvoLeitura = document.getElementById("conteudo-principal");
-        
         if (!alvoLeitura) return;
 
-        // Limpa instâncias anteriores se houver travamento
-        sinteseDeVoz.cancel();
+        sinteseDeVoz.cancel(); // Reseta instâncias pendentes
 
         const textoParaProcessar = alvoLeitura.innerText;
         instanciaUtterance = new SpeechSynthesisUtterance(textoParaProcessar);
         instanciaUtterance.lang = "pt-BR";
 
-        // Gerenciamento de estado dos botões da interface
         instanciaUtterance.onend = () => {
             btnFalar.disabled = false;
             btnParar.disabled = true;
@@ -97,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // --- 4. INTERAÇÃO DO LEITOR (SISTEMA DE COMENTÁRIOS VIA EVENTLISTENER) ---
+    // --- 4. ÁREA DE COMENTÁRIOS INTERATIVA ---
     const formComentario = document.getElementById("form-comentario");
     const caixaTextoComentario = document.getElementById("campo-texto-comentario");
     const feedComentarios = document.getElementById("feed-comentarios");
@@ -108,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const conteudoTexto = caixaTextoComentario.value.trim();
         if (conteudoTexto === "") return;
 
-        // Construção do elemento de feedback visual limpo
         const containerNovoComentario = document.createElement("div");
         containerNovoComentario.classList.add("comentario-item");
         
@@ -116,19 +106,16 @@ document.addEventListener("DOMContentLoaded", () => {
         textoComentarioElemento.innerText = conteudoTexto;
         
         containerNovoComentario.appendChild(textoComentarioElemento);
-        
-        // Insere o novo comentário no topo do feed interativo
         feedComentarios.insertBefore(containerNovoComentario, feedComentarios.firstChild);
 
-        // Boas Práticas: Limpeza e liberação de memória de logs desnecessários
-        caixaTextoComentario.value = "";
+        caixaTextoComentario.value = ""; // Limpeza de código pós-evento
     });
 
-    // Simulador de Inscrição (Evita recarregamento de página sem tratamento)
+    // Evento de simulação do formulário lateral
     const formSeminario = document.getElementById("form-seminario");
     formSeminario.addEventListener("submit", (evento) => {
         evento.preventDefault();
-        alert("Inscrição registrada com sucesso no sistema AgroFuturo 2026!");
+        alert("Inscrição efetuada com sucesso no banco de dados AgroFuturo!");
         formSeminario.reset();
     });
 });
