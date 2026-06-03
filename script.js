@@ -1,133 +1,176 @@
-document.addEventListener('DOMContentLoaded', () => {
+// Executa quando todo o DOM estiver completamente carregado
+document.addEventListener("DOMContentLoaded", () => {
+    
+    /* ==========================================================================
+       1. CONTROLE DO INTERFÁCE DO ACCORDION (EXPANSÍVEL)
+       ========================================================================== */
+    const headersAccordion = document.querySelectorAll(".accordion-header");
 
-    // --- GERENCIAMENTO DAS SEÇÕES EXPANSÍVEIS (ACCORDION) ---
-    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    headersAccordion.forEach(header => {
+        header.addEventListener("click", () => {
+            const item = header.parentElement;
+            const painel = header.nextElementSibling;
+            const estaAberto = item.classList.contains("aberto");
 
-    accordionHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            const isExpanded = header.getAttribute('aria-expanded') === 'true';
-            const contentId = header.getAttribute('aria-controls');
-            const contentBlock = document.getElementById(contentId);
-
-            // Colapsa todos os elementos abertos para criar efeito profissional fluido
-            accordionHeaders.forEach(otherHeader => {
-                otherHeader.setAttribute('aria-expanded', 'false');
-                const otherContent = document.getElementById(otherHeader.getAttribute('aria-controls'));
-                if (otherContent) otherContent.hidden = true;
+            // Fecha todos os outros painéis para manter a interface limpa
+            document.querySelectorAll(".accordion-item").forEach(outroItem => {
+                outroItem.classList.remove("aberto");
+                outroItem.querySelector(".accordion-header").setAttribute("aria-expanded", "false");
+                outroItem.querySelector(".accordion-content").setAttribute("hidden", "");
             });
 
-            // Alterna o estado do item atual
-            if (!isExpanded) {
-                header.setAttribute('aria-expanded', 'true');
-                contentBlock.hidden = false;
+            // Inverte o estado atual do clicado
+            if (!estaAberto) {
+                item.classList.add("aberto");
+                header.setAttribute("aria-expanded", "true");
+                painel.removeAttribute("hidden");
             }
         });
     });
 
-    // --- CONTROLES DE ACESSIBILIDADE FLUTUANTE ---
-    let currentFontSize = 100; // Porcentagem base (%)
-    const rootHtml = document.documentElement;
-    const bodyElement = document.body;
+    /* ==========================================================================
+       2. ACESSIBILIDADE: PAINEL FLUTUANTE, TAMANHO DA FONTE E MODO ESCURO
+       ========================================================================== */
+    const togglePainel = document.getElementById("toggle-painel-acessibilidade");
+    const painelAcessibilidade = document.getElementById("painel-acessibilidade");
+    const btnAumentarFonte = document.getElementById("btn-aumentar-fonte");
+    const btnDiminuirFonte = document.getElementById("btn-diminuir-fonte");
+    const btnModoEscuro = document.getElementById("btn-modo-escuro");
 
-    // Aumentar Fonte
-    document.getElementById('btn-increase-font').addEventListener('click', () => {
-        if (currentFontSize < 130) {
-            currentFontSize += 5;
-            rootHtml.style.fontSize = `${currentFontSize}%`;
+    let tamanhoFonteAtual = 100; // percentual
+
+    // Abre/Fecha painel flutuante
+    togglePainel.addEventListener("click", () => {
+        const expandido = togglePainel.getAttribute("aria-expanded") === "true";
+        togglePainel.setAttribute("aria-expanded", !expandido);
+        painelAcessibilidade.classList.toggle("ativo");
+    });
+
+    // Aumentar e Diminuir fonte de maneira proporcional e segura
+    btnAumentarFonte.addEventListener("click", () => {
+        if (tamanhoFonteAtual < 130) {
+            tamanhoFonteAtual += 10;
+            document.documentElement.style.fontSize = `${tamanhoFonteAtual}%`;
         }
     });
 
-    // Diminuir Fonte
-    document.getElementById('btn-decrease-font').addEventListener('click', () => {
-        if (currentFontSize > 85) {
-            currentFontSize -= 5;
-            rootHtml.style.fontSize = `${currentFontSize}%`;
+    btnDiminuirFonte.addEventListener("click", () => {
+        if (tamanhoFonteAtual > 85) {
+            tamanhoFonteAtual -= 10;
+            document.documentElement.style.fontSize = `${tamanhoFonteAtual}%`;
         }
     });
 
-    // Alternador de Temas (Modo Escuro / Claro)
-    document.getElementById('btn-toggle-theme').addEventListener('click', () => {
-        bodyElement.classList.toggle('light-theme');
+    // Alternar modo claro/escuro
+    btnModoEscuro.addEventListener("click", () => {
+        document.body.classList.toggle("modo-escuro");
     });
 
-    // --- LEITURA POR VOZ NATIVA (SpeechSynthesis API) ---
-    const btnStartTts = document.getElementById('btn-tts-start');
-    const btnStopTts = document.getElementById('btn-tts-stop');
-    let speechUtterance = null;
+    /* ==========================================================================
+       3. ACESSIBILIDADE: LEITURA POR VOZ (SPEECH SYNTHESIS API)
+       ========================================================================== */
+    const btnVozLer = document.getElementById("btn-voz-ler");
+    const btnVozParar = document.getElementById("btn-voz-parar");
+    const areaTexto = document.getElementById("area-leitura-voz");
+    
+    let trackerFala = null;
 
-    btnStartTts.addEventListener('click', () => {
-        // Alvo estrito: captura apenas o texto interno do artigo principal, ignorando formulários/menus
-        const mainTextContent = document.getElementById('main-text-content');
-        if (!mainTextContent) return;
-
-        const textToRead = mainTextContent.innerText;
-
-        // Cancelar sínteses anteriores ativas para evitar sobreposição
+    btnVozLer.addEventListener("click", () => {
+        // Se já estiver falando, cancela antes de reiniciar
         window.speechSynthesis.cancel();
 
-        speechUtterance = new SpeechSynthesisUtterance(textToRead);
-        speechUtterance.lang = 'pt-BR';
-        speechUtterance.rate = 1.0;
+        // Extrai o texto limpo ignorando botões, inputs, menus ocultos e svgs
+        // Cria uma cópia do conteúdo para processar com segurança
+        const cloneArea = areaTexto.cloneNode(true);
+        
+        // Remove elementos indesejados da cópia de leitura
+        cloneArea.querySelectorAll("button, form, textarea, input, svg, .accordion-numero, .imagem").forEach(el => el.remove());
+        
+        const textoParaLer = cloneArea.innerText.trim();
 
-        // Gerenciamento de estado visual dos botões ao finalizar ou pausar
-        speechUtterance.onend = () => {
-            btnStartTts.style.display = 'inline-block';
-            btnStopTts.style.display = 'none';
-        };
+        if (textoParaLer) {
+            trackerFala = new SpeechSynthesisUtterance(textoParaLer);
+            trackerFala.lang = "pt-BR";
+            trackerFala.rate = 1.0; // Velocidade natural
 
-        speechUtterance.onerror = () => {
-            btnStartTts.style.display = 'inline-block';
-            btnStopTts.style.display = 'none';
-        };
+            trackerFala.onstart = () => {
+                btnVozLer.disabled = true;
+                btnVozParar.disabled = false;
+            };
 
-        window.speechSynthesis.speak(speechUtterance);
+            trackerFala.onend = () => {
+                btnVozLer.disabled = false;
+                btnVozParar.disabled = true;
+            };
 
-        btnStartTts.style.display = 'none';
-        btnStopTts.style.display = 'inline-block';
+            trackerFala.onerror = () => {
+                btnVozLer.disabled = false;
+                btnVozParar.disabled = true;
+            };
+
+            window.speechSynthesis.speak(trackerFala);
+        }
     });
 
-    btnStopTts.addEventListener('click', () => {
+    btnVozParar.addEventListener("click", () => {
         window.speechSynthesis.cancel();
-        btnStartTts.style.display = 'inline-block';
-        btnStopTts.style.display = 'none';
+        btnVozLer.disabled = false;
+        btnVozParar.disabled = true;
     });
 
-    // --- PROCESSAMENTO INTERATIVO DOS FORMULÁRIOS ---
-    const seminarForm = document.getElementById('seminar-form');
-    const formSuccessMsg = document.getElementById('form-success-msg');
+    // Previne que a fala continue se o usuário fechar ou recarregar a aba
+    window.addEventListener("beforeunload", () => {
+        window.speechSynthesis.cancel();
+    });
 
-    seminarForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    /* ==========================================================================
+       4. FORMULÁRIO DE INSCRIÇÃO DO SEMINÁRIO
+       ========================================================================== */
+    const formSeminario = document.getElementById("form-seminario");
+    const msgSucessoForm = document.getElementById("msg-sucesso-form");
+
+    formSeminario.addEventListener("submit", (e) => {
+        e.preventDefault(); // Evita recarregamento real da página
         
-        // Simulação de envio com feedback visual moderno
-        formSuccessMsg.hidden = false;
-        seminarForm.reset();
-        
+        // Simulação de processamento de dados do formulário
+        msgSucessoForm.removeAttribute("hidden");
+        formSeminario.reset();
+
         setTimeout(() => {
-            formSuccessMsg.hidden = true;
+            msgSucessoForm.setAttribute("hidden", "");
         }, 5000);
     });
 
-    // Enviar Comentários Dinamicamente
-    const commentForm = document.getElementById('comment-form');
-    const commentsContainer = document.getElementById('comments-container');
+    /* ==========================================================================
+       5. RECURSO DE INTERAÇÃO COM O LEITOR: ENVIAR COMENTÁRIOS
+       ========================================================================== */
+    const formComentario = document.getElementById("form-comentario");
+    const txtComentario = document.getElementById("txt-comentario");
+    const listaComentarios = document.getElementById("lista-comentarios");
 
-    commentForm.addEventListener('submit', (e) => {
+    formComentario.addEventListener("submit", (e) => {
         e.preventDefault();
-        const textArea = document.getElementById('reader-comment');
-        const commentText = textArea.value.trim();
-
-        if (commentText) {
-            const newComment = document.createElement('div');
-            newComment.className = 'comment-item shadow-style';
-            newComment.innerHTML = `
-                <p class="comment-meta"><strong>Leitor Conectado</strong> • Agora mesmo</p>
-                <p class="comment-text">${commentText}</p>
-            `;
+        
+        const texto = txtComentario.value.trim();
+        if (texto) {
+            // Cria elemento de comentário moderno dinamicamente
+            const novoComentario = document.createElement("div");
+            novoComentario.className = "comentario-item";
             
-            // Insere o novo comentário no topo da lista
-            commentsContainer.insertBefore(newComment, commentsContainer.firstChild);
-            textArea.value = '';
+            // Obtém data simplificada
+            const agora = new Date();
+            const dataFormatada = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", {hour: '2-digit', minute:'2-digit'});
+
+            novoComentario.innerHTML = `
+                <div class="comentario-meta"><strong>Leitor Anônimo</strong> • ${dataFormatada}</div>
+                <div class="comentario-texto">${texto}</div>
+            `;
+
+            // Adiciona no topo da lista
+            listaComentarios.insertBefore(novoComentario, listaComentarios.firstChild);
+            
+            // Limpa o campo
+            txtComentario.value = "";
         }
     });
 });
