@@ -1,176 +1,134 @@
-// Executa quando todo o DOM estiver completamente carregado
 document.addEventListener("DOMContentLoaded", () => {
-    
-    /* ==========================================================================
-       1. CONTROLE DO INTERFÁCE DO ACCORDION (EXPANSÍVEL)
-       ========================================================================== */
-    const headersAccordion = document.querySelectorAll(".accordion-header");
 
-    headersAccordion.forEach(header => {
-        header.addEventListener("click", () => {
-            const item = header.parentElement;
-            const painel = header.nextElementSibling;
-            const estaAberto = item.classList.contains("aberto");
+    // --- 1. MECÂNICA DE SEÇÕES EXPANSÍVEIS (ACCORDION) ---
+    const disparadores = document.querySelectorAll(".accordion-disparador");
 
-            // Fecha todos os outros painéis para manter a interface limpa
-            document.querySelectorAll(".accordion-item").forEach(outroItem => {
-                outroItem.classList.remove("aberto");
-                outroItem.querySelector(".accordion-header").setAttribute("aria-expanded", "false");
-                outroItem.querySelector(".accordion-content").setAttribute("hidden", "");
+    disparadores.forEach(botao => {
+        botao.addEventListener("click", function() {
+            const cardItem = this.parentElement;
+            const painel = this.nextElementSibling;
+            const estaAtivo = cardItem.classList.contains("ativo");
+
+            // Fecha todos os painéis abertos de forma limpa (Garantindo comportamento consistente)
+            document.querySelectorAll(".card-item").forEach(item => {
+                item.classList.remove("ativo");
+                item.querySelector(".accordion-painel").style.maxHeight = null;
+                item.querySelector(".accordion-disparador").setAttribute("aria-expanded", "false");
             });
 
-            // Inverte o estado atual do clicado
-            if (!estaAberto) {
-                item.classList.add("aberto");
-                header.setAttribute("aria-expanded", "true");
-                painel.removeAttribute("hidden");
+            // Se o item clicado não estava ativo, abre ele
+            if (!estaAtivo) {
+                cardItem.classList.add("ativo");
+                this.setAttribute("aria-expanded", "true");
+                painel.style.maxHeight = painel.scrollHeight + "px";
             }
         });
     });
 
-    /* ==========================================================================
-       2. ACESSIBILIDADE: PAINEL FLUTUANTE, TAMANHO DA FONTE E MODO ESCURO
-       ========================================================================== */
-    const togglePainel = document.getElementById("toggle-painel-acessibilidade");
-    const painelAcessibilidade = document.getElementById("painel-acessibilidade");
-    const btnAumentarFonte = document.getElementById("btn-aumentar-fonte");
-    const btnDiminuirFonte = document.getElementById("btn-diminuir-fonte");
-    const btnModoEscuro = document.getElementById("btn-modo-escuro");
 
-    let tamanhoFonteAtual = 100; // percentual
-
-    // Abre/Fecha painel flutuante
-    togglePainel.addEventListener("click", () => {
-        const expandido = togglePainel.getAttribute("aria-expanded") === "true";
-        togglePainel.setAttribute("aria-expanded", !expandido);
-        painelAcessibilidade.classList.toggle("ativo");
-    });
-
-    // Aumentar e Diminuir fonte de maneira proporcional e segura
-    btnAumentarFonte.addEventListener("click", () => {
-        if (tamanhoFonteAtual < 130) {
-            tamanhoFonteAtual += 10;
-            document.documentElement.style.fontSize = `${tamanhoFonteAtual}%`;
-        }
-    });
-
-    btnDiminuirFonte.addEventListener("click", () => {
-        if (tamanhoFonteAtual > 85) {
-            tamanhoFonteAtual -= 10;
-            document.documentElement.style.fontSize = `${tamanhoFonteAtual}%`;
-        }
-    });
-
-    // Alternar modo claro/escuro
-    btnModoEscuro.addEventListener("click", () => {
-        document.body.classList.toggle("modo-escuro");
-    });
-
-    /* ==========================================================================
-       3. ACESSIBILIDADE: LEITURA POR VOZ (SPEECH SYNTHESIS API)
-       ========================================================================== */
-    const btnVozLer = document.getElementById("btn-voz-ler");
-    const btnVozParar = document.getElementById("btn-voz-parar");
-    const areaTexto = document.getElementById("area-leitura-voz");
+    // --- 2. PAINEL DE ACESSIBILIDADE DE FONTES E TEMA CLARO/ESCURO ---
+    let escalaFonteAtual = 100; // Percentual base
+    const htmlElemento = document.documentElement;
     
-    let trackerFala = null;
+    const btnAumentar = document.getElementById("btn-fonte-aumentar");
+    const btnDiminuir = document.getElementById("btn-fonte-diminuir");
+    const btnAlternarTema = document.getElementById("btn-alternar-tema");
 
-    btnVozLer.addEventListener("click", () => {
-        // Se já estiver falando, cancela antes de reiniciar
-        window.speechSynthesis.cancel();
-
-        // Extrai o texto limpo ignorando botões, inputs, menus ocultos e svgs
-        // Cria uma cópia do conteúdo para processar com segurança
-        const cloneArea = areaTexto.cloneNode(true);
-        
-        // Remove elementos indesejados da cópia de leitura
-        cloneArea.querySelectorAll("button, form, textarea, input, svg, .accordion-numero, .imagem").forEach(el => el.remove());
-        
-        const textoParaLer = cloneArea.innerText.trim();
-
-        if (textoParaLer) {
-            trackerFala = new SpeechSynthesisUtterance(textoParaLer);
-            trackerFala.lang = "pt-BR";
-            trackerFala.rate = 1.0; // Velocidade natural
-
-            trackerFala.onstart = () => {
-                btnVozLer.disabled = true;
-                btnVozParar.disabled = false;
-            };
-
-            trackerFala.onend = () => {
-                btnVozLer.disabled = false;
-                btnVozParar.disabled = true;
-            };
-
-            trackerFala.onerror = () => {
-                btnVozLer.disabled = false;
-                btnVozParar.disabled = true;
-            };
-
-            window.speechSynthesis.speak(trackerFala);
+    btnAumentar.addEventListener("click", () => {
+        if (escalaFonteAtual < 140) {
+            escalaFonteAtual += 10;
+            htmlElemento.style.fontSize = `${escalaFonteAtual}%`;
         }
     });
 
-    btnVozParar.addEventListener("click", () => {
-        window.speechSynthesis.cancel();
-        btnVozLer.disabled = false;
-        btnVozParar.disabled = true;
+    btnDiminuir.addEventListener("click", () => {
+        if (escalaFonteAtual > 80) {
+            escalaFonteAtual -= 10;
+            htmlElemento.style.fontSize = `${escalaFonteAtual}%`;
+        }
     });
 
-    // Previne que a fala continue se o usuário fechar ou recarregar a aba
-    window.addEventListener("beforeunload", () => {
-        window.speechSynthesis.cancel();
+    btnAlternarTema.addEventListener("click", () => {
+        document.body.classList.toggle("modo-claro");
     });
 
-    /* ==========================================================================
-       4. FORMULÁRIO DE INSCRIÇÃO DO SEMINÁRIO
-       ========================================================================== */
-    const formSeminario = document.getElementById("form-seminario");
-    const msgSucessoForm = document.getElementById("msg-sucesso-form");
 
-    formSeminario.addEventListener("submit", (e) => {
-        e.preventDefault(); // Evita recarregamento real da página
+    // --- 3. SPEECH SYNTHESIS API (SISTEMA DE LEITURA POR VOZ) ---
+    const btnFalar = document.getElementById("btn-voz-falar");
+    const btnParar = document.getElementById("btn-voz-parar");
+    const sinteseDeVoz = window.speechSynthesis;
+    let instanciaUtterance = null;
+
+    btnFalar.addEventListener("click", () => {
+        // REQUISITO: Isolamento semântico. Lê apenas o miolo informativo contido em <main>
+        const alvoLeitura = document.getElementById("conteudo-principal");
         
-        // Simulação de processamento de dados do formulário
-        msgSucessoForm.removeAttribute("hidden");
-        formSeminario.reset();
+        if (!alvoLeitura) return;
 
-        setTimeout(() => {
-            msgSucessoForm.setAttribute("hidden", "");
-        }, 5000);
+        // Limpa instâncias anteriores se houver travamento
+        sinteseDeVoz.cancel();
+
+        const textoParaProcessar = alvoLeitura.innerText;
+        instanciaUtterance = new SpeechSynthesisUtterance(textoParaProcessar);
+        instanciaUtterance.lang = "pt-BR";
+
+        // Gerenciamento de estado dos botões da interface
+        instanciaUtterance.onend = () => {
+            btnFalar.disabled = false;
+            btnParar.disabled = true;
+        };
+
+        instanciaUtterance.onerror = () => {
+            btnFalar.disabled = false;
+            btnParar.disabled = true;
+        };
+
+        sinteseDeVoz.speak(instanciaUtterance);
+        btnFalar.disabled = true;
+        btnParar.disabled = false;
     });
 
-    /* ==========================================================================
-       5. RECURSO DE INTERAÇÃO COM O LEITOR: ENVIAR COMENTÁRIOS
-       ========================================================================== */
+    btnParar.addEventListener("click", () => {
+        if (sinteseDeVoz.speaking) {
+            sinteseDeVoz.cancel();
+            btnFalar.disabled = false;
+            btnParar.disabled = true;
+        }
+    });
+
+
+    // --- 4. INTERAÇÃO DO LEITOR (SISTEMA DE COMENTÁRIOS VIA EVENTLISTENER) ---
     const formComentario = document.getElementById("form-comentario");
-    const txtComentario = document.getElementById("txt-comentario");
-    const listaComentarios = document.getElementById("lista-comentarios");
+    const caixaTextoComentario = document.getElementById("campo-texto-comentario");
+    const feedComentarios = document.getElementById("feed-comentarios");
 
-    formComentario.addEventListener("submit", (e) => {
-        e.preventDefault();
+    formComentario.addEventListener("submit", (evento) => {
+        evento.preventDefault();
         
-        const texto = txtComentario.value.trim();
-        if (texto) {
-            // Cria elemento de comentário moderno dinamicamente
-            const novoComentario = document.createElement("div");
-            novoComentario.className = "comentario-item";
-            
-            // Obtém data simplificada
-            const agora = new Date();
-            const dataFormatada = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", {hour: '2-digit', minute:'2-digit'});
+        const conteudoTexto = caixaTextoComentario.value.trim();
+        if (conteudoTexto === "") return;
 
-            novoComentario.innerHTML = `
-                <div class="comentario-meta"><strong>Leitor Anônimo</strong> • ${dataFormatada}</div>
-                <div class="comentario-texto">${texto}</div>
-            `;
+        // Construção do elemento de feedback visual limpo
+        const containerNovoComentario = document.createElement("div");
+        containerNovoComentario.classList.add("comentario-item");
+        
+        const textoComentarioElemento = document.createElement("p");
+        textoComentarioElemento.innerText = conteudoTexto;
+        
+        containerNovoComentario.appendChild(textoComentarioElemento);
+        
+        // Insere o novo comentário no topo do feed interativo
+        feedComentarios.insertBefore(containerNovoComentario, feedComentarios.firstChild);
 
-            // Adiciona no topo da lista
-            listaComentarios.insertBefore(novoComentario, listaComentarios.firstChild);
-            
-            // Limpa o campo
-            txtComentario.value = "";
-        }
+        // Boas Práticas: Limpeza e liberação de memória de logs desnecessários
+        caixaTextoComentario.value = "";
+    });
+
+    // Simulador de Inscrição (Evita recarregamento de página sem tratamento)
+    const formSeminario = document.getElementById("form-seminario");
+    formSeminario.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+        alert("Inscrição registrada com sucesso no sistema AgroFuturo 2026!");
+        formSeminario.reset();
     });
 });
