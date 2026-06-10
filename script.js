@@ -1,121 +1,135 @@
+// Aguarda o DOM estar totalmente carregado
 document.addEventListener("DOMContentLoaded", () => {
+    
+    // ==========================================================================
+    // SISTEMA 1: ACCORDION (SEÇÕES EXPANSÍVEIS)
+    // ==========================================================================
+    const headers = document.querySelectorAll(".accordion-header");
 
-    // --- 1. ACCORDION (CAIXAS EXPANSÍVEIS) ---
-    const disparadores = document.querySelectorAll(".accordion-disparador");
+    headers.forEach(header => {
+        header.addEventListener("click", function() {
+            const item = this.parentElement;
+            const content = this.nextElementSibling;
 
-    disparadores.forEach(botao => {
-        botao.addEventListener("click", function() {
-            const cardItem = this.parentElement;
-            const painel = this.nextElementSibling;
-            const estaAtivo = cardItem.classList.contains("ativo");
-
-            // Fecha painéis abertos para manter consistência operacional
-            document.querySelectorAll(".card-item").forEach(item => {
-                item.classList.remove("ativo");
-                item.querySelector(".accordion-painel").style.maxHeight = null;
-                item.querySelector(".accordion-disparador").setAttribute("aria-expanded", "false");
+            // Fecha outros itens se abertos (Opcional - Estilo Sanfona)
+            document.querySelectorAll(".accordion-item").forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove("active");
+                    otherItem.querySelector(".accordion-content").style.maxHeight = null;
+                }
             });
 
-            // Ativa o item clicado se ele não estava aberto
-            if (!estaAtivo) {
-                cardItem.classList.add("ativo");
-                this.setAttribute("aria-expanded", "true");
-                painel.style.maxHeight = painel.scrollHeight + "px";
+            // Alterna o estado do item clicado
+            item.classList.toggle("active");
+
+            if (item.classList.contains("active")) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = null;
             }
         });
     });
 
+    // ==========================================================================
+    // SISTEMA 2: ACESSIBILIDADE (SpeechSynthesis e Fontes)
+    // ==========================================================================
+    let tamanhoFonteAtual = 100; // Representa em %
+    const bodyElement = document.body;
 
-    // --- 2. CONTROLE DE ACESSIBILIDADE DE FONTES ---
-    let escalaFonteAtual = 100;
-    const htmlElemento = document.documentElement;
-    
-    const btnAumentar = document.getElementById("btn-fonte-aumentar");
-    const btnDiminuir = document.getElementById("btn-fonte-diminuir");
+    // Controle de Tamanho de Fonte
+    document.getElementById("btn-aumentar").addEventListener("click", () => {
+        tamanhoFonteAtual += 10;
+        document.documentElement.style.fontSize = `${tamanhoFonteAtual}%`;
+    });
 
-    btnAumentar.addEventListener("click", () => {
-        if (escalaFonteAtual < 140) {
-            escalaFonteAtual += 10;
-            htmlElemento.style.fontSize = `${escalaFonteAtual}%`;
+    document.getElementById("btn-diminuir").addEventListener("click", () => {
+        if (tamanhoFonteAtual > 70) {
+            tamanhoFonteAtual -= 10;
+            document.documentElement.style.fontSize = `${tamanhoFonteAtual}%`;
         }
     });
 
-    btnDiminuir.addEventListener("click", () => {
-        if (escalaFonteAtual > 80) {
-            escalaFonteAtual -= 10;
-            htmlElemento.style.fontSize = `${escalaFonteAtual}%`;
-        }
+    // Modo Claro / Escuro
+    document.getElementById("btn-tema").addEventListener("click", () => {
+        bodyElement.classList.toggle("light-mode");
     });
 
-
-    // --- 3. SPEECH SYNTHESIS API (LEITURA POR VOZ ACESSÍVEL) ---
-    const btnFalar = document.getElementById("btn-voz-falar");
-    const btnParar = document.getElementById("btn-voz-parar");
-    const sinteseDeVoz = window.speechSynthesis;
-    let instanciaUtterance = null;
+    // Leitura por Voz (SpeechSynthesis API)
+    const btnFalar = document.getElementById("btn-falar");
+    const btnParar = document.getElementById("btn-parar");
+    let synthUtterance = null;
 
     btnFalar.addEventListener("click", () => {
-        const alvoLeitura = document.getElementById("conteudo-principal");
-        if (!alvoLeitura) return;
+        // Evita sobreposição de vozes se já estiver lendo
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
 
-        sinteseDeVoz.cancel(); // Reseta instâncias pendentes
+        // Seleciona exclusivamente o texto do conteúdo principal (ignora formulários, menus, botões)
+        const principalEl = document.getElementById("conteudo-leitura");
+        if (!principalEl) return;
 
-        const textoParaProcessar = alvoLeitura.innerText;
-        instanciaUtterance = new SpeechSynthesisUtterance(textoParaProcessar);
-        instanciaUtterance.lang = "pt-BR";
+        const textoParaLer = principalEl.innerText;
 
-        instanciaUtterance.onend = () => {
-            btnFalar.disabled = false;
-            btnParar.disabled = true;
-        };
+        synthUtterance = new SpeechSynthesisUtterance(textoParaLer);
+        synthUtterance.lang = "pt-BR";
+        synthUtterance.rate = 1.1; // Velocidade levemente ajustada
 
-        instanciaUtterance.onerror = () => {
-            btnFalar.disabled = false;
-            btnParar.disabled = true;
-        };
-
-        sinteseDeVoz.speak(instanciaUtterance);
-        btnFalar.disabled = true;
-        btnParar.disabled = false;
+        window.speechSynthesis.speak(synthUtterance);
     });
 
     btnParar.addEventListener("click", () => {
-        if (sinteseDeVoz.speaking) {
-            sinteseDeVoz.cancel();
-            btnFalar.disabled = false;
-            btnParar.disabled = true;
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
         }
     });
 
-
-    // --- 4. ÁREA DE COMENTÁRIOS INTERATIVA ---
-    const formComentario = document.getElementById("form-comentario");
-    const caixaTextoComentario = document.getElementById("campo-texto-comentario");
-    const feedComentarios = document.getElementById("feed-comentarios");
-
-    formComentario.addEventListener("submit", (evento) => {
-        evento.preventDefault();
-        
-        const conteudoTexto = caixaTextoComentario.value.trim();
-        if (conteudoTexto === "") return;
-
-        const containerNovoComentario = document.createElement("div");
-        containerNovoComentario.classList.add("comentario-item");
-        
-        const textoComentarioElemento = document.createElement("p");
-        textoComentarioElemento.innerText = conteudoTexto;
-        
-        containerNovoComentario.appendChild(textoComentarioElemento);
-        feedComentarios.insertBefore(containerNovoComentario, feedComentarios.firstChild);
-
-        caixaTextoComentario.value = ""; // Limpeza de código pós-evento
-    });
-
-    // Evento de simulação do formulário lateral
-    const formSeminario = document.getElementById("form-seminario");
-    formSeminario.addEventListener("submit", (evento) => {
-        evento.preventDefault();
-        alert("Inscrição efetuada com sucesso no banco de dados AgroFuturo!");
+    // ==========================================================================
+    // SISTEMA 3: FORMULÁRIO DE INSCRIÇÃO & COMENTÁRIOS (INTERATIVIDADE)
+    // ==========================================================================
+    const formSeminario = document.getElementById("cadastro-seminario");
+    formSeminario.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const nome = document.getElementById("nome").value;
+        alert(`Inscrição realizada com sucesso, ${nome}! Esperamos você no AgroFuturo.`);
         formSeminario.reset();
     });
+
+    const formComentario = document.getElementById("form-comentario");
+    const listaComentarios = document.getElementById("lista-comentarios");
+
+    formComentario.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const texto = document.getElementById("txt-comentario").value;
+
+        if (texto.trim() !== "") {
+            const novoComentario = document.createElement("div");
+            novoComentario.classList.add("comentario-postado");
+            novoComentario.innerHTML = `<p><strong>Leitor Anônimo:</strong> ${texto}</p>`;
+            
+            listaComentarios.prepend(novoComentario);
+            document.getElementById("txt-comentario").value = "";
+        }
+    });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
