@@ -1,7 +1,7 @@
 /* --- CONFIGURAÇÕES E ESTILO VISUAL DA PALETA REVISADA --- */
 :root {
     /* Cores Rigorosamente Definidas para Legibilidade Absoluta */
-    --preto-absoluto: #289b31;     /* Fundo principal da página */
+    --preto-absoluto: hsl(125, 59%, 38%);     /* Fundo principal da página */
     --azul-profundo: #7e4483;      /* Fundos dos blocos e containers */
     --azul-metalico: #1f44b4;      /* Fundos de botões e bordas estruturais */
     --azul-celeste: #0077B6;       /* Elementos primários de destaque e CTAs */
