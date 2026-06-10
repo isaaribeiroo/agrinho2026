@@ -1,14 +1,14 @@
 /* --- CONFIGURAÇÕES E ESTILO VISUAL DA PALETA REVISADA --- */
 :root {
     /* Cores Rigorosamente Definidas para Legibilidade Absoluta */
-    --preto-absoluto: #030712;     /* Fundo principal da página */
-    --azul-profundo: #0B132B;      /* Fundos dos blocos e containers */
-    --azul-metalico: #1C2541;      /* Fundos de botões e bordas estruturais */
+    --preto-absoluto: #289b31;     /* Fundo principal da página */
+    --azul-profundo: #7e4483;      /* Fundos dos blocos e containers */
+    --azul-metalico: #1f44b4;      /* Fundos de botões e bordas estruturais */
     --azul-celeste: #0077B6;       /* Elementos primários de destaque e CTAs */
     --azul-cristal: #00F5D4;       /* Títulos de seções, ícones e sublinhados */
     --roxo-neon: #7209B7;          /* Efeitos de Hover e interações dinâmicas */
-    --prata-tecnico: #E2E8F0;      /* Cor base de toda a escrita (Contraste Máximo sobre o Preto) */
-    --branco-puro: #FFFFFF;        /* Títulos principais e chamadas do formulário */
+    --prata-tecnico: #d80e00;      /* Cor base de toda a escrita (Contraste Máximo sobre o Preto) */
+    --branco-puro: #07f5fd;        /* Títulos principais e chamadas do formulário */
     
     /* Configurações Responsivas Fluidas */
     --fonte-dinamica: clamp(1rem, 0.95rem + 0.22vw, 1.25rem);
